@@ -1,0 +1,7 @@
+requests
+selenium
+webdriver-manager
+bs4
+pandas
+openpyxl
+pywin32
