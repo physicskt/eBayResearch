@@ -20,6 +20,7 @@ from module_py import eBay_check_identity
 from module_py import get_category_id
 from module_py import get_all_sheets_list
 from module_py import log
+from module_py import column_letter_to_number
 
 def search_words_in_eBay(
         search_words_list, 
@@ -222,7 +223,7 @@ def scraiping():
     write_excel.open_visible_excel(search_words_excel)
 
 
-def get_cheapest_price():
+def write_category_id_to_excel():
     search_words_excel = "scraiping_list.xlsx"
     xls = pd.ExcelFile(search_words_excel)
     all_sheets = xls.sheet_names  # シート名のリスト
@@ -273,7 +274,41 @@ def get_cheapest_price():
     log.log_message("最安値検索終了")
 
 
+def search_cheapst_price():
+    search_words_excel = "scraiping_list.xlsx"
+    sheet_names = read_excel.get_excel_data(
+        input_excel=search_words_excel,
+        sheet_name= "ワードリスト",
+        usecols = [2],
+        col_names = ["number"]
+    )
+    sheet_names = [str(name) for name in sheet_names[0] if not pd.isna(name) ]
+    print(sheet_names)
+
+    usecols = [
+        column_letter_to_number.column_letter_to_number("D")-1,
+        column_letter_to_number.column_letter_to_number("H")-1,
+        ]
+    
+    # シート毎に処理
+    for sheet in sheet_names:
+        reduced_titles, flags1 = read_excel.get_excel_data(
+            input_excel=search_words_excel,
+            sheet_name= sheet,
+            usecols = usecols,
+            col_names = ["Reduced_title", "flags1"]
+        )
+        # print(reduced_titles)
+        print(flags1)
+
+        # ちょっと上手く動かなかった、、、、
+        exclude_list = ["." for titles in reduced_titles]
+        search_number = [1 for titles in reduced_titles]
+        search_results = search_words_in_eBay(reduced_titles, exclude_list, search_number, flags1)
+        print(search_results)
+
 if __name__ == "__main__":
-    scraiping()
-    get_cheapest_price()
+    # scraiping()
+    # write_category_id_to_excel()
+    search_cheapst_price()
     write_excel.open_visible_excel("scraiping_list.xlsx")
